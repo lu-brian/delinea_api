@@ -1,5 +1,3 @@
-from pprint import pprint
-from re import X
 import requests as r
 
 # tt0 = {
