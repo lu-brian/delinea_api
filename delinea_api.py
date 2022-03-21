@@ -1,4 +1,5 @@
-import requests as r
+from getpass import getpass
+import requests
 
 # tt0 = {
 #     'tenantURL':'', # required
@@ -38,7 +39,7 @@ class Delinea_api():
                 "client_id": tenant['username']
                 }
 
-            self.bearer = (r.post(f"https://{tenant['tenantURL']}/Oauth2/Token/{tenant['appID']}",headers=head,data=key).json())['access_token']
+            self.bearer = (requests.post(f"https://{tenant['tenantURL']}/Oauth2/Token/{tenant['appID']}",headers=head,data=key).json())['access_token']
 
         # # advanced authentication
         else:
@@ -53,7 +54,7 @@ class Delinea_api():
                 "Version": "1.0"
                 }
 
-            response = r.post(f"https://{tenant['tenantURL']}/Security/StartAuthentication",headers=head,json=key).json()
+            response = requests.post(f"https://{tenant['tenantURL']}/Security/StartAuthentication",headers=head,json=key).json()
             sessionid = response["Result"]["SessionId"]
             
             def processMechanisms(response):
@@ -71,7 +72,7 @@ class Delinea_api():
                         "Answer": tenant['password']
                     }
 
-                    response = r.post(f"https://{tenant['tenantURL']}/Security/AdvanceAuthentication",headers=head,json=key)
+                    response = requests.post(f"https://{tenant['tenantURL']}/Security/AdvanceAuthentication",headers=head,json=key)
                 else:
                     count = 0
                     
@@ -121,7 +122,7 @@ class Delinea_api():
                             "Answer": getpass(f'# {selection} > enter password/pin: \n# {selection} > ')
                         }
 
-                    response = r.post(f"https://{tenant['tenantURL']}/Security/AdvanceAuthentication",headers=head,json=key)
+                    response = requests.post(f"https://{tenant['tenantURL']}/Security/AdvanceAuthentication",headers=head,json=key)
 
                 # # continue if bearer found, otherwise repeat with new mechanism
                 if '.ASPXAUTH' in response.cookies.keys():
@@ -160,7 +161,7 @@ class Delinea_api():
                     }
                 }
 
-            return r.post(f"https://{self.tenant['tenantURL']}/Redrock/query", headers=headers, json=query).json()
+            return requests.post(f"https://{self.tenant['tenantURL']}/Redrock/query", headers=headers, json=query).json()
 
         elif endpoint.lower() == "/core/makefile" or endpoint.lower() == "core/makefile":
 
@@ -171,7 +172,7 @@ class Delinea_api():
             "Accept-Encoding": "gzip, deflate, br"
             }
 
-            rep = r.post(f"https://{self.tenant['tenantURL']}/{endpoint}", headers=headers, data=key)
+            rep = requests.post(f"https://{self.tenant['tenantURL']}/{endpoint}", headers=headers, data=key)
             
             # # test if response is good
             if rep.status_code == 200:
@@ -191,4 +192,4 @@ class Delinea_api():
 
         else:
 
-            return r.post(f"https://{self.tenant['tenantURL']}/{endpoint}", headers=header, json=key).json()
+            return requests.post(f"https://{self.tenant['tenantURL']}/{endpoint}", headers=header, json=key).json()
